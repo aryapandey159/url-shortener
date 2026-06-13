@@ -1,6 +1,8 @@
 package com.URL.URLShortner.Controller;
 
+import com.URL.URLShortner.DTO.UrlExpiration;
 import com.URL.URLShortner.DTO.UrlRequest;
+import com.URL.URLShortner.DTO.UrlResponse;
 import com.URL.URLShortner.Entity.UrlMapping;
 import com.URL.URLShortner.Service.UrlService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,16 +27,41 @@ public class restController {
         return finalString;
     }
     @GetMapping("/{shortCode}")
-    public String OrignalUrl(@PathVariable String shortCode){
-        return urlService.findOrignalUrl(shortCode);
+    public UrlExpiration OrignalUrl(@PathVariable String shortCode){
+
+        String originalUrl = urlService.findOrignalUrl(shortCode);
+        UrlExpiration urlExpiration = new UrlExpiration();
+        if(originalUrl.equals("Url is expired")){
+            urlExpiration.setMessage("Url is expired");
+            return urlExpiration;
+        }
+        urlExpiration.setMessage(originalUrl);
+        return urlExpiration;
     }
 
     @GetMapping("/redirect/{shortCode}")
-    public void redirectUrl(@PathVariable String shortCode, HttpServletResponse response) throws IOException {
+    public UrlExpiration redirectUrl(@PathVariable String shortCode, HttpServletResponse response) throws IOException {
 
         String originalUrl =
                 urlService.findOrignalUrl(shortCode);
 
+        UrlExpiration urlExpiration = new UrlExpiration();
+        if(originalUrl.equals("Url is expired")){
+            urlExpiration.setMessage("Url is expired");
+            return urlExpiration;
+        }
         response.sendRedirect(originalUrl);
+        urlExpiration.setMessage("Url is Working");
+        return urlExpiration;
+    }
+
+    //To find how much time a Url clicked
+    @GetMapping("/analytics/{shortCode}")
+    public UrlResponse analytics(@PathVariable String shortCode){
+        UrlResponse urlResponse= new UrlResponse();
+        Long numberOfClicks= urlService.getNumberOfClicks(shortCode);
+        urlResponse.setClicks(numberOfClicks);
+
+        return urlResponse;
     }
 }

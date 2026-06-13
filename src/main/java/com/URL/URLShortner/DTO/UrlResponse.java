@@ -1,13 +1,13 @@
 package com.URL.URLShortner.DTO;
 
 public class UrlResponse {
-    private String url;
+    private Long clicks;
 
-    public String getUrl() {
-        return url;
+    public Long getClicks() {
+        return clicks;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setClicks(Long clicks) {
+        this.clicks = clicks;
     }
 }

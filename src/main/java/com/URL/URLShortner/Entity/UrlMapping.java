@@ -1,9 +1,6 @@
 package com.URL.URLShortner.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +15,10 @@ public class UrlMapping {
     private String shortCode;
 
     private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private Long clickCount = 0L;
+
+    private LocalDateTime expiryDate;
 
     public Long getId() {
         return id;
@@ -49,5 +50,21 @@ public class UrlMapping {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getClickCount() {
+        return clickCount;
+    }
+
+    public void setClickCount(Long clickCount) {
+        this.clickCount = clickCount;
+    }
+
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
     }
 }
