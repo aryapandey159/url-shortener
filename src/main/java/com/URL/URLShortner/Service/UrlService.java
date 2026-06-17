@@ -15,6 +15,9 @@ public class UrlService {
     @Autowired
     UrlRepository urlRepository;
 
+    @Autowired
+    RedisService redisService;
+
     public String createSortUrl(String orignalUrl){
         String randomUrl = generateSortCode();
 
@@ -38,13 +41,26 @@ public class UrlService {
                 .substring(0,6);
     }
     public String findOrignalUrl(String sortUrl){
-        UrlMapping urlMapping = urlRepository.findByShortCode(sortUrl);
+
+        UrlMapping urlMapping = redisService.Get(sortUrl);
+
+        if(urlMapping == null){
+            urlMapping = urlRepository.findByShortCode(sortUrl);
+            redisService.Set(sortUrl,urlMapping);
+        }
         Long count=0L;
         if(urlMapping.getClickCount() != null){
-            count = urlMapping.getClickCount()+1;
+            count = urlMapping.getClickCount() + 1;
+        } else {
+            count = 1L;
         }
+
         urlMapping.setClickCount(count);
+
         urlRepository.save(urlMapping);
+
+       // Update cache
+        redisService.Set(sortUrl, urlMapping);
 
         //Adding this to know weather our url is expired or not
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -62,11 +78,8 @@ public class UrlService {
 
     //To give the number of counts
     public Long getNumberOfClicks(String sortUrl){
-        UrlMapping urlMapping = urlRepository.findByShortCode(sortUrl);
-        Long count=0L;
-        if(urlMapping.getClickCount() != null){
-            count = urlMapping.getClickCount()+1;
-        }
-        return count;
+        UrlMapping urlMapping = redisService.Get(sortUrl);
+
+        return urlMapping.getClickCount();
     }
 }

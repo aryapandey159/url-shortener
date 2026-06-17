@@ -2,10 +2,11 @@ package com.URL.URLShortner.Entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-public class UrlMapping {
+public class UrlMapping implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,5 +67,16 @@ public class UrlMapping {
 
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public UrlMapping() {
+    }
+    public UrlMapping(UrlMapping urlMapping){
+        this.id = urlMapping.getId();
+        this.originalUrl = urlMapping.getOriginalUrl();
+        this.shortCode = urlMapping.getShortCode();
+        this.createdAt = urlMapping.getCreatedAt();
+        this.clickCount = urlMapping.getClickCount();
+        this.expiryDate = urlMapping.getExpiryDate();
     }
 }

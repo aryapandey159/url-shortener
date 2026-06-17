@@ -3,12 +3,10 @@ package com.URL.URLShortner.Controller;
 import com.URL.URLShortner.DTO.UrlExpiration;
 import com.URL.URLShortner.DTO.UrlRequest;
 import com.URL.URLShortner.DTO.UrlResponse;
-import com.URL.URLShortner.Entity.UrlMapping;
 import com.URL.URLShortner.Service.UrlService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -18,6 +16,7 @@ import java.net.URI;
 public class restController {
     @Autowired
     UrlService urlService;
+
 
 
     @PostMapping("/shorten")
@@ -63,5 +62,15 @@ public class restController {
         urlResponse.setClicks(numberOfClicks);
 
         return urlResponse;
+    }
+
+    @Autowired
+    RedisTemplate redisTemplate;
+
+    @GetMapping("/redis")
+    public void redisRest(){
+         redisTemplate.opsForValue().set("email","gmail@email.com");
+        Object salary= redisTemplate.opsForValue().get("salary");
+        int a= 1;
     }
 }
