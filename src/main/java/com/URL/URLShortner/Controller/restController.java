@@ -3,7 +3,10 @@ package com.URL.URLShortner.Controller;
 import com.URL.URLShortner.DTO.UrlExpiration;
 import com.URL.URLShortner.DTO.UrlRequest;
 import com.URL.URLShortner.DTO.UrlResponse;
+import com.URL.URLShortner.Entity.UrlMapping;
+import com.URL.URLShortner.Service.RateLimiterService;
 import com.URL.URLShortner.Service.UrlService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +19,9 @@ import java.net.URI;
 public class restController {
     @Autowired
     UrlService urlService;
+
+    @Autowired
+    private RateLimiterService rateLimiterService;
 
 
 
@@ -39,10 +45,20 @@ public class restController {
     }
 
     @GetMapping("/redirect/{shortCode}")
-    public UrlExpiration redirectUrl(@PathVariable String shortCode, HttpServletResponse response) throws IOException {
+    public UrlExpiration redirectUrl(@PathVariable String shortCode, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String ipAddress = request.getRemoteAddr();
 
         String originalUrl =
                 urlService.findOrignalUrl(shortCode);
+
+        if (!rateLimiterService.isAllowed(ipAddress)) {
+            response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Too many requests"
+            );
+            return new UrlExpiration("Too many requests");
+        }
 
         UrlExpiration urlExpiration = new UrlExpiration();
         if(originalUrl.equals("Url is expired")){
@@ -64,13 +80,5 @@ public class restController {
         return urlResponse;
     }
 
-    @Autowired
-    RedisTemplate redisTemplate;
 
-    @GetMapping("/redis")
-    public void redisRest(){
-         redisTemplate.opsForValue().set("email","gmail@email.com");
-        Object salary= redisTemplate.opsForValue().get("salary");
-        int a= 1;
-    }
 }
